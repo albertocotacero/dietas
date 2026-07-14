@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dietas iPad V3.1</title><style>
+body{font-family:Arial,sans-serif;margin:10px;background:#f4f4f4}h1{margin:0 0 10px} .legend span{padding:6px 10px;border-radius:6px;margin:2px;display:inline-block}.month{background:white;border-radius:10px;padding:10px;margin:10px 0}.head,.day,.empty{padding:6px;text-align:center}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.head{background:#eee;font-weight:bold}.day{border:1px solid #ccc;border-radius:5px;cursor:pointer}.work{background:#dff0d8}.weekend{background:#c8f0c8;color:#006400}.nat{background:#ffcaca;color:#8b0000}.loc{background:#cfe8ff;color:#003c8f}.vac{background:#e3ccff;color:#5a189a}.panel{position:fixed;left:0;right:0;bottom:0;background:white;border-top:2px solid #ccc;padding:10px;display:none}.panel button{margin:4px;padding:10px}.sum{margin-top:8px;font-size:12px;font-weight:bold}
+</style></head><body>
+<h1>Dietas iPad V3.1</h1>
+<div class='legend'><span style='background:#dff0d8'>✅ Laborable</span><span style='background:#c8f0c8'>✅✅ Fin semana</span><span style='background:#ffcaca'>✅✅ Festivo nacional</span><span style='background:#cfe8ff'>✅✅ Festivo local</span><span style='background:#e3ccff'>🏖 Vacaciones</span></div>
+<div id='app'></div><h2 id='res'></h2>
+<div id='panel' class='panel'>
+<div id='fecha'></div>
+<button onclick='setState("work")'>✅ Trabajado</button>
+<button onclick='setState("vac")'>🏖 Vacaciones</button>
+<button onclick='setState("clear")'>❌ Borrar</button>
+<button onclick='hidePanel()'>Cerrar</button>
+</div>
+<script>
+const year=2026;const dias=['L','M','X','J','V','S','D'];
+const nat=['2026-01-01','2026-01-06','2026-05-01','2026-08-15','2026-10-12','2026-12-06','2026-12-08','2026-12-25'];
+let db=JSON.parse(localStorage.getItem('dietas31')||'{"work":{},"vac":{},"local":{}}');
+let current='';
+function save(){localStorage.setItem('dietas31',JSON.stringify(db));}
+function hidePanel(){document.getElementById('panel').style.display='none';}
+function setState(t){if(t==='work'){db.work[current]=true;delete db.vac[current];} if(t==='vac'){db.vac[current]=true;delete db.work[current];} if(t==='clear'){delete db.work[current];delete db.vac[current];} save();hidePanel();draw();}
+function addLocal(m){let d=window.prompt('Día festivo local'); if(d){db.local[`2026-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`]=true;save();draw();}}
+function draw(){let app=document.getElementById('app');app.innerHTML='';let tn=0,tw=0,tfn=0,tfl=0,tvac=0,total=0;
+for(let m=0;m<12;m++){let box=document.createElement('div');box.className='month';box.innerHTML=`<div style="display:flex;justify-content:space-between"><b>${new Date(year,m,1).toLocaleString('es',{month:'long'}).toUpperCase()}</b><button onclick='addLocal(${m})'>⚙️</button></div><div class='grid'></div><div class='sum'></div>`;let g=box.querySelector('.grid');dias.forEach(x=>{let h=document.createElement('div');h.className='head';h.textContent=x;g.appendChild(h)});
+let off=(new Date(year,m,1).getDay()+6)%7;for(let i=0;i<off;i++){let e=document.createElement('div');e.className='empty';g.appendChild(e)}
+let mn=0,mw=0,mfn=0,mfl=0,mv=0;let dm=new Date(year,m+1,0).getDate();
+for(let d=1;d<=dm;d++){let k=`2026-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;let wd=new Date(year,m,d).getDay();let c=document.createElement('div');c.className='day';let txt=d;
+if(db.vac[k]){c.classList.add('vac');txt+=' 🏖';mv++;tvac++;}
+else if(db.work[k]){
+if(nat.includes(k)){c.classList.add('nat');txt+=' ✅✅';mfn++;tfn++;total+=135;}
+else if(db.local[k]){c.classList.add('loc');txt+=' ✅✅';mfl++;tfl++;total+=135;}
+else if(wd===0||wd===6){c.classList.add('weekend');txt+=' ✅✅';mw++;tw++;total+=135;}
+else {c.classList.add('work');txt+=' ✅';mn++;tn++;total+=35;}}
+else if(nat.includes(k)){c.classList.add('nat');txt+=' 🎉';}
+else if(db.local[k]){c.classList.add('loc');txt+=' 🎉';}
+ c.textContent=txt;c.onclick=()=>{current=k;document.getElementById('fecha').innerText=k;document.getElementById('panel').style.display='block';};g.appendChild(c);} 
+box.querySelector('.sum').innerHTML=`Laborables:${mn} | Fin semana:${mw} | Festivos nac:${mfn} | Festivos loc:${mfl} | Vacaciones:${mv}`;app.appendChild(box);} 
+document.getElementById('res').innerHTML=`Resumen anual → Laborables ${tn} | Fin semana ${tw} | Festivos nacionales ${tfn} | Festivos locales ${tfl} | Vacaciones ${tvac} | Total ${total} €`;}
+draw();
+</script></body></html>
