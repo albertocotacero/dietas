@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#102D52" />
+  <title>Cotacero Galicia · Dietas V7</title>
+
+  <style>
+    :root{
+      --navy:#102D52;
+      --navy-2:#173F70;
+      --gold:#D4B06A;
+      --gold-2:#E7C887;
+      --bg:#EEF2F6;
+      --card:#FFFFFF;
+      --text:#172033;
+      --muted:#6B7484;
+      --line:#D9E0E8;
+      --work:#DFF4E5;
+      --weekend:#FFF0D2;
+      --holiday:#DDEBFF;
+      --vacation:#EEDFFF;
+      --danger:#FFE0E0;
+      --shadow:0 8px 28px rgba(16,45,82,.10);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    button,input,select,textarea{font:inherit}
+    button{touch-action:manipulation}
+    .hidden{display:none!important}
+
+    .app{
+      width:min(1180px,100%);
+      margin:0 auto;
+      min-height:100vh;
+      padding-bottom:28px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:linear-gradient(135deg,var(--navy),var(--navy-2));
+      color:white;
+      padding:10px 12px 12px;
+      box-shadow:0 3px 14px rgba(0,0,0,.18);
+    }
+
+    .topline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .brand img{
+      width:auto;
+      height:48px;
+      max-width:190px;
+      object-fit:contain;
+      background:white;
+      border-radius:12px;
+      padding:5px 8px;
+    }
+
+    .brandtext{
+      min-width:0;
+    }
+
+    .brandtext h1{
+      margin:0;
+      font-size:1.02rem;
+      line-height:1.1;
+      white-space:nowrap;
+    }
+
+    .brandtext small{
+      color:#D9E2EF;
+      font-size:.76rem;
+    }
+
+    .topactions{
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      border:1px solid transparent;
+      border-radius:12px;
+      min-height:42px;
+      padding:9px 12px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+
+    .btn:active{transform:scale(.98)}
+    .btn-primary{background:var(--gold);color:var(--navy)}
+    .btn-outline{background:transparent;color:white;border-color:rgba(255,255,255,.46)}
+    .btn-light{background:white;color:var(--navy);border-color:var(--line)}
+    .btn-danger{background:#B82B2B;color:white}
+    .btn-block{width:100%}
+
+    .navrow{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+    }
+
+    .navbox{
+      display:grid;
+      grid-template-columns:42px 1fr 42px;
+      align-items:center;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:14px;
+      overflow:hidden;
+    }
+
+    .navbox button{
+      border:0;
+      background:transparent;
+      color:white;
+      font-size:1.15rem;
+      min-height:44px;
+      cursor:pointer;
+    }
+
+    .navlabel{
+      text-align:center;
+      font-weight:800;
+      letter-spacing:.02em;
+      color:var(--gold-2);
+    }
+
+    main{padding:12px}
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      margin-bottom:12px;
+    }
+
+    .periodbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .periodtitle{
+      font-size:1.1rem;
+      font-weight:850;
+      color:var(--navy);
+    }
+
+    .periodrange{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-top:2px;
+    }
+
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px 12px;
+      margin-top:12px;
+      font-size:.82rem;
+      color:var(--muted);
+    }
+
+    .legend span{display:flex;align-items:center;gap:6px}
+    .dot{width:12px;height:12px;border-radius:4px;border:1px solid rgba(0,0,0,.08)}
+    .dot-work{background:var(--work)}
+    .dot-weekend{background:var(--weekend)}
+    .dot-holiday{background:var(--holiday)}
+    .dot-vacation{background:var(--vacation)}
+
+    .calendar-wrap{overflow-x:auto}
+    .calendar{
+      display:grid;
+      grid-template-columns:repeat(7,minmax(72px,1fr));
+      gap:6px;
+      min-width:560px;
+    }
+
+    .weekday{
+      text-align:center;
+      font-weight:850;
+      color:var(--navy);
+      padding:8px 4px;
+      font-size:.86rem;
+    }
+
+    .day{
+      min-height:88px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:white;
+      padding:7px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+    }
+
+    .day.outside{
+      opacity:.42;
+      background:#F4F6F8;
+    }
+
+    .day.today{
+      outline:3px solid var(--gold);
+      outline-offset:-2px;
+    }
+
+    .day.work{background:var(--work)}
+    .day.weekend-work{background:var(--weekend)}
+    .day.holiday{background:var(--holiday)}
+    .day.vacation{background:var(--vacation)}
+
+    .daynum{
+      font-weight:850;
+      font-size:1rem;
+    }
+
+    .daymeta{
+      font-size:.72rem;
+      color:var(--muted);
+      line-height:1.25;
+      min-height:18px;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+    }
+
+    .mark{
+      font-weight:900;
+      font-size:1rem;
+      color:var(--navy);
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+
+    .stat{
+      background:#F7F9FB;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      min-height:88px;
+    }
+
+    .stat small{color:var(--muted);display:block}
+    .stat strong{font-size:1.45rem;color:var(--navy);display:block;margin-top:3px}
+    .stat.total{
+      background:linear-gradient(135deg,var(--navy),var(--navy-2));
+      color:white;
+    }
+    .stat.total small,.stat.total strong{color:white}
+
+    .dashboard-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .month-card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:13px;
+      background:white;
+      cursor:pointer;
+    }
+
+    .month-card h3{
+      margin:0 0 8px;
+      color:var(--navy);
+      font-size:1rem;
+    }
+
+    .month-card .amount{
+      color:var(--gold);
+      font-weight:900;
+      font-size:1.45rem;
+      margin-top:8px;
+    }
+
+    .month-card .minirow{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      color:var(--muted);
+      font-size:.8rem;
+      margin-top:4px;
+    }
+
+    .annual{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .section-title{
+      margin:0 0 12px;
+      color:var(--navy);
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(5,18,35,.58);
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      z-index:60;
+      padding:12px;
+    }
+
+    .modal.open{display:flex}
+
+    .modalbox{
+      width:min(520px,100%);
+      background:white;
+      border-radius:22px 22px 16px 16px;
+      padding:16px;
+      box-shadow:0 -10px 45px rgba(0,0,0,.28);
+      max-height:92vh;
+      overflow:auto;
+    }
+
+    .modalbox h2{
+      margin:0 0 4px;
+      color:var(--navy);
+    }
+
+    .modal-sub{
+      color:var(--muted);
+      margin-bottom:12px;
+      font-size:.92rem;
+    }
+
+    .actiongrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .actionbtn{
+      min-height:54px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#F8FAFC;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .formgroup{margin:12px 0}
+    .formgroup label{
+      display:block;
+      font-size:.84rem;
+      font-weight:800;
+      margin-bottom:6px;
+      color:var(--navy);
+    }
+
+    .input{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:11px;
+      background:white;
+      color:var(--text);
+    }
+
+    textarea.input{min-height:82px;resize:vertical}
+
+    .modal-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .settings-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .footer-note{
+      color:var(--muted);
+      text-align:center;
+      font-size:.78rem;
+      padding:4px 12px 18px;
+    }
+
+    @media(max-width:760px){
+      .brandtext{display:none}
+      .brand img{height:42px;max-width:150px}
+      .topactions .btn{padding:8px 10px}
+      .summary-grid,.annual{grid-template-columns:repeat(2,1fr)}
+      .dashboard-grid{grid-template-columns:1fr}
+      .navrow{grid-template-columns:1fr}
+      .day{min-height:78px}
+    }
+
+    @media(max-width:430px){
+      .topline{align-items:flex-start}
+      .topactions{gap:5px}
+      .topactions .btn{font-size:.78rem;min-height:38px}
+      main{padding:8px}
+      .card{padding:10px;border-radius:15px}
+      .calendar{min-width:520px}
+      .summary-grid{grid-template-columns:1fr 1fr}
+      .actiongrid{grid-template-columns:1fr}
+    }
+
+    @media print{
+      @page{size:A4 portrait;margin:10mm}
+      body{background:white}
+      .topbar,.no-print,.footer-note{display:none!important}
+      .app{width:100%;max-width:none}
+      main{padding:0}
+      .card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+      #calendarView{display:none!important}
+      #dashboardView{display:block!important}
+      .dashboard-grid{grid-template-columns:repeat(3,1fr);gap:7px}
+      .month-card{padding:8px;border-radius:8px}
+      .month-card .amount{font-size:1.1rem}
+      .month-card h3{font-size:.85rem}
+      .month-card .minirow{font-size:.68rem}
+      .annual{grid-template-columns:repeat(4,1fr);gap:7px}
+      .stat{padding:8px;min-height:auto}
+      .stat strong{font-size:1rem}
+      .section-title{font-size:1.05rem;margin-bottom:8px}
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topline">
+      <div class="brand">
+        <img src="logo.png" alt="Logo Cotacero Galicia" onerror="this.style.display='none'">
+        <div class="brandtext">
+          <h1>Dietas · V7</h1>
+          <small>Control mensual y anual</small>
+        </div>
+      </div>
+
+      <div class="topactions">
+        <button class="btn btn-outline" type="button" id="btnConfig">⚙️ Configuración</button>
+        <button class="btn btn-primary" type="button" id="btnDashboard">📊 Dashboard</button>
+      </div>
+    </div>
+
+    <div class="navrow no-print">
+      <div class="navbox">
+        <button type="button" id="prevYear" aria-label="Año anterior">◀</button>
+        <div class="navlabel" id="yearLabel">2026</div>
+        <button type="button" id="nextYear" aria-label="Año siguiente">▶</button>
+      </div>
+
+      <div class="navbox">
+        <button type="button" id="prevMonth" aria-label="Mes anterior">◀</button>
+        <div class="navlabel" id="monthLabel">ENERO</div>
+        <button type="button" id="nextMonth" aria-label="Mes siguiente">▶</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="calendarView">
+      <div class="card">
+        <div class="periodbar">
+          <div>
+            <div class="periodtitle" id="periodTitle"></div>
+            <div class="periodrange" id="periodRange"></div>
+          </div>
+          <button class="btn btn-light no-print" id="btnToday" type="button">Hoy</button>
+        </div>
+
+        <div class="legend">
+          <span><i class="dot dot-work"></i> Trabajo laborable</span>
+          <span><i class="dot dot-weekend"></i> Trabajo fin de semana</span>
+          <span><i class="dot dot-holiday"></i> Festivo</span>
+          <span><i class="dot dot-vacation"></i> Vacaciones</span>
+        </div>
+      </div>
+
+      <div class="card calendar-wrap">
+        <div class="calendar" id="calendar"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Resumen del período</h2>
+        <div class="summary-grid" id="periodSummary"></div>
+      </div>
+    </section>
+
+    <section id="dashboardView" class="hidden">
+      <div class="card no-print">
+        <div class="periodbar">
+          <div>
+            <h2 class="section-title" style="margin-bottom:2px">Dashboard anual</h2>
+            <div class="periodrange" id="dashboardYearText"></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-light" type="button" id="btnBack">← Volver</button>
+            <button class="btn btn-primary" type="button" id="btnPrint">📄 Exportar PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Resumen mensual</h2>
+        <div class="dashboard-grid" id="dashboardGrid"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Resumen anual</h2>
+        <div class="annual" id="annualSummary"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer-note">Los datos se guardan automáticamente en este dispositivo.</div>
+</div>
+
+<div class="modal" id="dayModal" aria-hidden="true">
+  <div class="modalbox">
+    <h2 id="modalDateTitle">Día</h2>
+    <div class="modal-sub" id="modalDateSub"></div>
+
+    <div class="actiongrid">
+      <button class="actionbtn" type="button" data-day-action="work">✅ Trabajo</button>
+      <button class="actionbtn" type="button" data-day-action="holiday">🟦 Festivo</button>
+      <button class="actionbtn" type="button" data-day-action="vacation">🏖 Vacaciones</button>
+      <button class="actionbtn" type="button" data-day-action="clear">❌ Borrar estado</button>
+    </div>
+
+    <div class="formgroup">
+      <label for="dayNote">Observaciones</label>
+      <textarea id="dayNote" class="input" placeholder="Añade una observación opcional"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-light" type="button" id="closeDayModal">Cancelar</button>
+      <button class="btn btn-primary" type="button" id="saveDayModal">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="configModal" aria-hidden="true">
+  <div class="modalbox">
+    <h2>Configuración</h2>
+    <div class="modal-sub">Importes y datos generales</div>
+
+    <div class="settings-grid">
+      <div class="formgroup">
+        <label for="dailyAllowance">Dieta diaria (€)</label>
+        <input class="input" id="dailyAllowance" type="number" min="0" step="0.01">
+      </div>
+
+      <div class="formgroup">
+        <label for="weekendBonus">Plus fin de semana/festivo (€)</label>
+        <input class="input" id="weekendBonus" type="number" min="0" step="0.01">
+      </div>
+    </div>
+
+    <div class="formgroup">
+      <label for="employeeName">Nombre</label>
+      <input class="input" id="employeeName" type="text" placeholder="Nombre opcional">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-light" type="button" id="closeConfigModal">Cancelar</button>
+      <button class="btn btn-primary" type="button" id="saveConfig">Guardar</button>
+    </div>
+
+    <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+
+    <div class="settings-grid">
+      <button class="btn btn-light" type="button" id="exportData">Exportar copia</button>
+      <label class="btn btn-light" style="text-align:center;cursor:pointer">
+        Importar copia
+        <input type="file" id="importData" accept="application/json" hidden>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const STORAGE_KEY = "cotacero_dietas_v7";
+
+  const MONTHS = [
+    "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+    "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+  ];
+
+  const WEEKDAYS = ["L","M","X","J","V","S","D"];
+
+  const defaultState = {
+    version: 7,
+    viewYear: new Date().getFullYear(),
+    viewMonth: new Date().getMonth(),
+    settings: {
+      dailyAllowance: 35,
+      weekendBonus: 100,
+      employeeName: ""
+    },
+    days: {}
+  };
+
+  let state = loadState();
+  let selectedDateKey = null;
+  let selectedDayType = null;
+
+  const el = id => document.getElementById(id);
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return structuredCloneSafe(defaultState);
+      const parsed = JSON.parse(raw);
+      return {
+        ...structuredCloneSafe(defaultState),
+        ...parsed,
+        settings:{
+          ...defaultState.settings,
+          ...(parsed.settings || {})
+        },
+        days: parsed.days || {}
+      };
+    }catch(error){
+      console.warn("No se pudieron cargar los datos:", error);
+      return structuredCloneSafe(defaultState);
+    }
+  }
+
+  function structuredCloneSafe(value){
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function pad(n){
+    return String(n).padStart(2,"0");
+  }
+
+  function toKey(date){
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+  }
+
+  function fromKey(key){
+    const [y,m,d] = key.split("-").map(Number);
+    return new Date(y,m-1,d);
+  }
+
+  function euro(value){
+    return new Intl.NumberFormat("es-ES",{
+      style:"currency",
+      currency:"EUR"
+    }).format(value || 0);
+  }
+
+  function formatDateLong(date){
+    return new Intl.DateTimeFormat("es-ES",{
+      weekday:"long",
+      day:"numeric",
+      month:"long",
+      year:"numeric"
+    }).format(date);
+  }
+
+  function getPeriodForMonth(year, month){
+    const start = new Date(year, month-1, 26);
+    const end = new Date(year, month, 25);
+    return {start,end};
+  }
+
+  function getPeriodLabel(year, month){
+    return `Período ${MONTHS[month]} ${year}`;
+  }
+
+  function eachDate(start,end,callback){
+    const d = new Date(start);
+    while(d <= end){
+      callback(new Date(d));
+      d.setDate(d.getDate()+1);
+    }
+  }
+
+  function isWeekend(date){
+    const day = date.getDay();
+    return day === 0 || day === 6;
+  }
+
+  function getDayEntry(key){
+    return state.days[key] || null;
+  }
+
+  function calculatePeriod(year,month){
+    const {start,end} = getPeriodForMonth(year,month);
+    const result = {
+      laborables:0,
+      finesSemana:0,
+      festivos:0,
+      vacaciones:0,
+      diasDieta:0,
+      dietas:0,
+      plus:0,
+      total:0
+    };
+
+    eachDate(start,end,date => {
+      const entry = getDayEntry(toKey(date));
+      if(!entry) return;
+
+      if(entry.type === "vacation"){
+        result.vacaciones++;
+        return;
+      }
+
+      if(entry.type === "holiday"){
+        result.festivos++;
+        result.diasDieta++;
+        result.dietas += Number(state.settings.dailyAllowance) || 0;
+        result.plus += Number(state.settings.weekendBonus) || 0;
+        return;
+      }
+
+      if(entry.type === "work"){
+        result.diasDieta++;
+        result.dietas += Number(state.settings.dailyAllowance) || 0;
+
+        if(isWeekend(date)){
+          result.finesSemana++;
+          result.plus += Number(state.settings.weekendBonus) || 0;
+        }else{
+          result.laborables++;
+        }
+      }
+    });
+
+    result.total = result.dietas + result.plus;
+    return result;
+  }
+
+  function statCard(label,value,total=false){
+    return `
+      <div class="stat ${total ? "total" : ""}">
+        <small>${label}</small>
+        <strong>${value}</strong>
+      </div>
+    `;
+  }
+
+  function render(){
+    el("yearLabel").textContent = state.viewYear;
+    el("monthLabel").textContent = MONTHS[state.viewMonth].toUpperCase();
+
+    const {start,end} = getPeriodForMonth(state.viewYear,state.viewMonth);
+    el("periodTitle").textContent = getPeriodLabel(state.viewYear,state.viewMonth);
+    el("periodRange").textContent =
+      `${start.getDate()} ${MONTHS[start.getMonth()]} ${start.getFullYear()} → ${end.getDate()} ${MONTHS[end.getMonth()]} ${end.getFullYear()}`;
+
+    renderCalendar();
+    renderPeriodSummary();
+  }
+
+  function renderCalendar(){
+    const calendar = el("calendar");
+    calendar.innerHTML = "";
+
+    WEEKDAYS.forEach(day => {
+      calendar.insertAdjacentHTML("beforeend",`<div class="weekday">${day}</div>`);
+    });
+
+    const first = new Date(state.viewYear,state.viewMonth,1);
+    const firstMondayIndex = (first.getDay()+6)%7;
+    const gridStart = new Date(state.viewYear,state.viewMonth,1-firstMondayIndex);
+    const todayKey = toKey(new Date());
+
+    for(let i=0;i<42;i++){
+      const date = new Date(gridStart);
+      date.setDate(gridStart.getDate()+i);
+      const key = toKey(date);
+      const entry = getDayEntry(key);
+      const outside = date.getMonth() !== state.viewMonth;
+
+      let classes = "day";
+      let mark = "";
+      let status = "";
+
+      if(outside) classes += " outside";
+      if(key === todayKey) classes += " today";
+
+      if(entry){
+        if(entry.type === "work"){
+          if(isWeekend(date)){
+            classes += " weekend-work";
+            mark = "✓✓";
+            status = "Trabajo FDS";
+          }else{
+            classes += " work";
+            mark = "✓";
+            status = "Trabajo";
+          }
+        }else if(entry.type === "holiday"){
+          classes += " holiday";
+          mark = "🎉";
+          status = "Festivo";
+        }else if(entry.type === "vacation"){
+          classes += " vacation";
+          mark = "🏖";
+          status = "Vacaciones";
+        }
+      }
+
+      const note = entry?.note ? escapeHtml(entry.note) : status;
+
+      calendar.insertAdjacentHTML("beforeend",`
+        <button class="${classes}" type="button" data-date="${key}" aria-label="${formatDateLong(date)}">
+          <div style="display:flex;justify-content:space-between;gap:5px">
+            <span class="daynum">${date.getDate()}</span>
+            <span class="mark">${mark}</span>
+          </div>
+          <div class="daymeta">${note || ""}</div>
+        </button>
+      `);
+    }
+  }
+
+  function renderPeriodSummary(){
+    const r = calculatePeriod(state.viewYear,state.viewMonth);
+
+    el("periodSummary").innerHTML = [
+      statCard("Laborables",r.laborables),
+      statCard("Fin de semana",r.finesSemana),
+      statCard("Festivos",r.festivos),
+      statCard("Vacaciones",r.vacaciones),
+      statCard("Dietas",euro(r.dietas)),
+      statCard("Plus",euro(r.plus)),
+      statCard("Días con dieta",r.diasDieta),
+      statCard("Total",euro(r.total),true)
+    ].join("");
+  }
+
+  function renderDashboard(){
+    el("dashboardYearText").textContent =
+      `${state.settings.employeeName ? state.settings.employeeName + " · " : ""}${state.viewYear}`;
+
+    const grid = el("dashboardGrid");
+    grid.innerHTML = "";
+
+    let annual = {
+      laborables:0,
+      finesSemana:0,
+      festivos:0,
+      vacaciones:0,
+      diasDieta:0,
+      dietas:0,
+      plus:0,
+      total:0
+    };
+
+    for(let month=0;month<12;month++){
+      const r = calculatePeriod(state.viewYear,month);
+
+      Object.keys(annual).forEach(key => annual[key] += r[key]);
+
+      grid.insertAdjacentHTML("beforeend",`
+        <article class="month-card" data-month="${month}">
+          <h3>${MONTHS[month].toUpperCase()}</h3>
+          <div class="minirow"><span>Laborables</span><strong>${r.laborables}</strong></div>
+          <div class="minirow"><span>FDS</span><strong>${r.finesSemana}</strong></div>
+          <div class="minirow"><span>Festivos</span><strong>${r.festivos}</strong></div>
+          <div class="minirow"><span>Vacaciones</span><strong>${r.vacaciones}</strong></div>
+          <div class="minirow"><span>Dietas</span><strong>${euro(r.dietas)}</strong></div>
+          <div class="minirow"><span>Plus</span><strong>${euro(r.plus)}</strong></div>
+          <div class="amount">${euro(r.total)}</div>
+        </article>
+      `);
+    }
+
+    el("annualSummary").innerHTML = [
+      statCard("Laborables",annual.laborables),
+      statCard("Fin de semana",annual.finesSemana),
+      statCard("Festivos",annual.festivos),
+      statCard("Vacaciones",annual.vacaciones),
+      statCard("Dietas",euro(annual.dietas)),
+      statCard("Plus",euro(annual.plus)),
+      statCard("Días con dieta",annual.diasDieta),
+      statCard("Total anual",euro(annual.total),true)
+    ].join("");
+  }
+
+  function showDashboard(){
+    el("calendarView").classList.add("hidden");
+    el("dashboardView").classList.remove("hidden");
+    renderDashboard();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function showCalendar(){
+    el("dashboardView").classList.add("hidden");
+    el("calendarView").classList.remove("hidden");
+    render();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function openDayModal(key){
+    selectedDateKey = key;
+    const date = fromKey(key);
+    const entry = getDayEntry(key);
+
+    selectedDayType = entry?.type || null;
+    el("modalDateTitle").textContent = date.getDate() + " de " + MONTHS[date.getMonth()];
+    el("modalDateSub").textContent = formatDateLong(date);
+    el("dayNote").value = entry?.note || "";
+
+    document.querySelectorAll("[data-day-action]").forEach(btn => {
+      btn.style.outline = btn.dataset.dayAction === selectedDayType ? "3px solid var(--gold)" : "none";
+    });
+
+    openModal("dayModal");
+  }
+
+  function openModal(id){
+    const modal = el(id);
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+  }
+
+  function closeModal(id){
+    const modal = el(id);
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+  }
+
+  function saveSelectedDay(){
+    if(!selectedDateKey) return;
+
+    const note = el("dayNote").value.trim();
+
+    if(!selectedDayType && !note){
+      delete state.days[selectedDateKey];
+    }else{
+      state.days[selectedDateKey] = {
+        type:selectedDayType,
+        note
+      };
+    }
+
+    saveState();
+    closeModal("dayModal");
+    render();
+  }
+
+  function openConfig(){
+    el("dailyAllowance").value = state.settings.dailyAllowance;
+    el("weekendBonus").value = state.settings.weekendBonus;
+    el("employeeName").value = state.settings.employeeName || "";
+    openModal("configModal");
+  }
+
+  function saveConfig(){
+    state.settings.dailyAllowance = Math.max(0,Number(el("dailyAllowance").value) || 0);
+    state.settings.weekendBonus = Math.max(0,Number(el("weekendBonus").value) || 0);
+    state.settings.employeeName = el("employeeName").value.trim();
+    saveState();
+    closeModal("configModal");
+    render();
+  }
+
+  function exportBackup(){
+    const blob = new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `dietas_v7_${state.viewYear}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function importBackup(file){
+    if(!file) return;
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      try{
+        const imported = JSON.parse(reader.result);
+        if(!imported || typeof imported !== "object" || !imported.days){
+          throw new Error("Formato no válido");
+        }
+
+        state = {
+          ...structuredCloneSafe(defaultState),
+          ...imported,
+          settings:{
+            ...defaultState.settings,
+            ...(imported.settings || {})
+          },
+          days: imported.days || {}
+        };
+
+        saveState();
+        closeModal("configModal");
+        render();
+        alert("Copia importada correctamente.");
+      }catch(error){
+        alert("No se pudo importar el archivo. Comprueba que sea una copia válida de Dietas V7.");
+      }
+    };
+
+    reader.readAsText(file);
+  }
+
+  function escapeHtml(text){
+    return String(text)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  el("prevYear").addEventListener("click",() => {
+    state.viewYear--;
+    saveState();
+    render();
+  });
+
+  el("nextYear").addEventListener("click",() => {
+    state.viewYear++;
+    saveState();
+    render();
+  });
+
+  el("prevMonth").addEventListener("click",() => {
+    state.viewMonth--;
+    if(state.viewMonth < 0){
+      state.viewMonth = 11;
+      state.viewYear--;
+    }
+    saveState();
+    render();
+  });
+
+  el("nextMonth").addEventListener("click",() => {
+    state.viewMonth++;
+    if(state.viewMonth > 11){
+      state.viewMonth = 0;
+      state.viewYear++;
+    }
+    saveState();
+    render();
+  });
+
+  el("btnToday").addEventListener("click",() => {
+    const now = new Date();
+    state.viewYear = now.getFullYear();
+    state.viewMonth = now.getMonth();
+    saveState();
+    render();
+  });
+
+  el("calendar").addEventListener("click",event => {
+    const button = event.target.closest("[data-date]");
+    if(button) openDayModal(button.dataset.date);
+  });
+
+  document.querySelectorAll("[data-day-action]").forEach(button => {
+    button.addEventListener("click",() => {
+      const action = button.dataset.dayAction;
+
+      if(action === "clear"){
+        selectedDayType = null;
+        el("dayNote").value = "";
+      }else{
+        selectedDayType = action;
+      }
+
+      document.querySelectorAll("[data-day-action]").forEach(btn => {
+        btn.style.outline = btn.dataset.dayAction === selectedDayType ? "3px solid var(--gold)" : "none";
+      });
+    });
+  });
+
+  el("saveDayModal").addEventListener("click",saveSelectedDay);
+  el("closeDayModal").addEventListener("click",() => closeModal("dayModal"));
+
+  el("btnConfig").addEventListener("click",openConfig);
+  el("saveConfig").addEventListener("click",saveConfig);
+  el("closeConfigModal").addEventListener("click",() => closeModal("configModal"));
+
+  el("btnDashboard").addEventListener("click",showDashboard);
+  el("btnBack").addEventListener("click",showCalendar);
+  el("btnPrint").addEventListener("click",() => window.print());
+
+  el("dashboardGrid").addEventListener("click",event => {
+    const card = event.target.closest("[data-month]");
+    if(!card) return;
+    state.viewMonth = Number(card.dataset.month);
+    saveState();
+    showCalendar();
+  });
+
+  el("exportData").addEventListener("click",exportBackup);
+  el("importData").addEventListener("change",event => {
+    importBackup(event.target.files?.[0]);
+    event.target.value = "";
+  });
+
+  document.querySelectorAll(".modal").forEach(modal => {
+    modal.addEventListener("click",event => {
+      if(event.target === modal) closeModal(modal.id);
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
