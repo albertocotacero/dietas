@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cota Cero Galicia | Dietas V6</title><style>
+:root{--navy:#102D52;--gold:#D4B06A;--bg:#F5F7FA;--card:#FFFFFF}
+body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;color:#1f2937}
+.header{background:var(--navy);color:var(--gold);padding:18px;border-bottom-left-radius:20px;border-bottom-right-radius:20px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.grid7{display:grid;grid-template-columns:repeat(7,1fr);align-items:center;gap:8px}.center{text-align:center}.btn{background:rgba(212,176,106,.15);color:var(--gold);border:1px solid var(--gold);border-radius:12px;padding:8px}.title{font-size:26px;font-weight:700}.month{font-size:22px;font-weight:700}
+.card{background:white;margin:14px;border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.h{font-weight:700;text-align:center;padding:8px}.d{min-height:58px;border:1px solid #ddd;border-radius:10px;padding:4px;text-align:center}.lb{background:#eaf8ea}.wk{background:#d9f6d9}.nat{background:#ffdcdc}.loc{background:#dcedff}.vac{background:#ecd8ff}.total{color:var(--gold);font-size:28px;font-weight:800}.hidden{display:none}.monthGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mini{background:white;border-radius:14px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+@media(max-width:900px){.monthGrid{grid-template-columns:1fr}.grid7{grid-template-columns:repeat(7,1fr)}}
+</style></head><body>
+<div id="mainView">
+<div class="header">
+<div style="font-size:22px;font-weight:700">COTA CERO GALICIA</div>
+<div class="grid7" style="margin-top:14px">
+<div></div><div class="center"><button class="btn" onclick="y(-1)">◀</button> <span id="yy" class="title"></span> <button class="btn" onclick="y(1)">▶</button></div><div></div><div class="center"><button class="btn" onclick="m(-1)">◀</button> <span id="mm" class="month"></span> <button class="btn" onclick="m(1)">▶</button></div><div></div><div class="center"><button class="btn" onclick="cfg()">⚙ Config</button></div><div class="center"><button class="btn" onclick="showSummary()">📊 Resumen</button></div>
+</div></div>
+<div class="card"><div id="cal" class="cal"></div></div>
+<div class="card"><h3>Resumen mensual</h3><div id="res"></div></div>
+</div>
+<div id="summaryView" class="hidden">
+<div class="header"><div style="font-size:28px">📊 Resumen anual</div></div>
+<div class="card"><div id="months" class="monthGrid"></div></div>
+<div class="card"><h2>Resumen Anual</h2><div id="annual"></div><br><button class="btn" onclick="window.print()">📄 Exportar PDF A4</button> <button class="btn" onclick="back()">← Volver</button></div>
+</div>
+<script>
+let st=JSON.parse(localStorage.getItem('ccg_v6')||'{"work":{},"vac":{},"local":{},"cfg":{"d":35,"p":100},"year":2026,"month":0}');
+let year=st.year,month=st.month;
+function save(){st.year=year;st.month=month;localStorage.setItem('ccg_v6',JSON.stringify(st));}
+function y(n){year+=n;draw();} function m(n){month+=n;if(month<0){month=11;year--} if(month>11){month=0;year++} draw();}
+function cfg(){let d=prompt('Dieta diaria',st.cfg.d);let p=prompt('Plus festivo/fin semana',st.cfg.p);if(d)st.cfg.d=+d;if(p)st.cfg.p=+p;save();draw();}
+function k(d){return `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
+function draw(){yy.textContent=year;mm.textContent=new Date(year,month,1).toLocaleString('es',{month:'long'}).toUpperCase();cal.innerHTML='';['L','M','X','J','V','S','D'].forEach(x=>cal.innerHTML+=`<div class=h>${x}</div>`);let o=(new Date(year,month,1).getDay()+6)%7;for(let i=0;i<o;i++)cal.innerHTML+='<div></div>';let L=0,W=0,N=0,F=0,V=0,di=0,pl=0;let nat=[`${year}-01-01`,`${year}-01-06`,`${year}-05-01`,`${year}-08-15`,`${year}-10-12`,`${year}-12-06`,`${year}-12-08`,`${year}-12-25`];
+for(let d=1;d<=new Date(year,month+1,0).getDate();d++){let kk=k(d),wd=new Date(year,month,d).getDay(),c='d',txt=d;if(st.vac[kk]){c+=' vac';txt+=' 🏖';V++;}else if(st.work[kk]){di+=st.cfg.d;if(nat.includes(kk)){c+=' nat';txt+=' ✅✅';N++;pl+=st.cfg.p}else if(st.local[kk]){c+=' loc';txt+=' ✅✅';F++;pl+=st.cfg.p}else if(wd==0||wd==6){c+=' wk';txt+=' ✅✅';W++;pl+=st.cfg.p}else{c+=' lb';txt+=' ✅';L++;}} else if(nat.includes(kk)){c+=' nat';txt+=' 🎉'}
+cal.innerHTML+=`<div class='${c}' onclick="sel('${kk}')">${txt}</div>`}
+res.innerHTML=`Laborables: ${L}<br>Fin de semana: ${W}<br>Festivos nacionales: ${N}<br>Festivos locales: ${F}<br>Vacaciones: ${V}<hr>Dietas: ${di} €<br>Plus: ${pl} €<br><div class='total'>${di+pl} €</div>`;save();}
+function sel(day){let a=prompt('T=Trabajo, V=Vacaciones, F=Festivo local, B=Borrar'); if(!a)return; a=a.toUpperCase(); if(a=='T')st.work[day]=1; if(a=='V'){st.vac[day]=1;delete st.work[day]} if(a=='F')st.local[day]=1; if(a=='B'){delete st.work[day];delete st.vac[day];delete st.local[day]} save();draw();}
+function showSummary(){document.getElementById('mainView').classList.add('hidden');document.getElementById('summaryView').classList.remove('hidden');renderSummary();}
+function back(){document.getElementById('summaryView').classList.add('hidden');document.getElementById('mainView').classList.remove('hidden');}
+function renderSummary(){let months=document.getElementById('months');months.innerHTML='';let AN={L:0,W:0,N:0,F:0,V:0,D:0,P:0}; for(let m=0;m<12;m++){let name=new Date(year,m,1).toLocaleString('es',{month:'long'}).toUpperCase();let L=0,W=0,N=0,F=0,V=0,D=0,P=0; for(let d=1;d<=31;d++){let kk=`${year}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;let wd=new Date(year,m,d).getDay(); if(st.vac[kk])V++; else if(st.work[kk]){D+=st.cfg.d;if(st.local[kk]){F++;P+=st.cfg.p}else if(wd==0||wd==6){W++;P+=st.cfg.p}else L++;}} AN.L+=L;AN.W+=W;AN.F+=F;AN.V+=V;AN.D+=D;AN.P+=P; months.innerHTML+=`<div class='mini'><b>${name}</b><hr>Lab ${L}<br>FDS ${W}<br>Fest Loc ${F}<br>Vac ${V}<hr><b>${D+P} €</b></div>`;} annual.innerHTML=`Laborables: ${AN.L}<br>Fin de semana: ${AN.W}<br>Festivos locales: ${AN.F}<br>Vacaciones: ${AN.V}<hr>Dietas: ${AN.D} €<br>Plus: ${AN.P} €<hr><div class='total'>${AN.D+AN.P} €</div>`;}
+draw();
+</script></body></html>
