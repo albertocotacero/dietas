@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102D52">
+  <title>Cotacero Galicia · Dietas V8.4</title>
+  <style>
+    :root{
+      --navy:#102D52;--navy2:#173F70;--gold:#D4B06A;--bg:#EEF2F6;
+      --card:#fff;--text:#172033;--muted:#6B7484;--line:#D9E0E8;
+      --work:#DFF4E5;--weekend:#FFF0D2;--holiday:#DDEBFF;--vacation:#EEDFFF;
+      --danger:#B82B2B;--shadow:0 8px 28px rgba(16,45,82,.10);--radius:18px;
+    }
+    *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    button,input,textarea{font:inherit}button{touch-action:manipulation}.hidden{display:none!important}
+    .app{width:min(1180px,100%);margin:auto;min-height:100vh;padding-bottom:30px}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:linear-gradient(135deg,var(--navy),var(--navy2));
+      color:white;
+      padding:10px 20px 10px;
+      box-shadow:0 3px 14px rgba(0,0,0,.18);
+      min-height:168px
+    }
+    .topline{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      min-height:112px
+    }
+    .brand{
+      display:flex;
+      align-items:flex-start;
+      justify-content:flex-start;
+      min-width:0;
+      height:112px
+    }
+    .brand img{
+      height:108px;
+      width:auto;
+      max-width:220px;
+      object-fit:contain;
+      object-position:left top;
+      background:transparent;
+      border-radius:0;
+      padding:0
+    }
+        .actions{
+      display:flex;
+      gap:9px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+      margin-top:28px
+    }
+    .btn{border:1px solid transparent;border-radius:12px;min-height:42px;padding:9px 12px;font-weight:750;cursor:pointer}
+    .btn:active{transform:scale(.98)}.primary{background:var(--gold);color:var(--navy)}.outline{background:transparent;color:white;border-color:rgba(255,255,255,.45)}
+    .light{background:white;color:var(--navy);border-color:var(--line)}.danger{background:var(--danger);color:white}.block{width:100%}
+    .navrow{
+      width:min(560px,70%);
+      margin:-26px auto 0;
+      display:grid;
+      grid-template-columns:220px 250px;
+      justify-content:center;
+      gap:18px
+    }.navbox{
+      display:grid;
+      grid-template-columns:42px 1fr 42px;
+      align-items:center;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:14px;
+      overflow:hidden;
+      min-height:48px
+    }
+    .navbox button{
+      border:0;
+      background:transparent;
+      color:white;
+      font-size:1.1rem;
+      min-height:46px
+    }
+    .navlabel{
+      text-align:center;
+      font-weight:850;
+      color:#E7C887;
+      font-size:1rem
+    }
+    .syncbar{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin-top:-1px;margin-left:auto;width:max-content;font-size:.75rem;color:#E5EDF7}.syncdot{width:9px;height:9px;border-radius:50%;background:#FFD166}.syncdot.ok{background:#5EE18C}.syncdot.bad{background:#FF6B6B}
+    main{padding:12px}.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:12px}
+    .periodbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.periodtitle{font-size:1.1rem;font-weight:850;color:var(--navy)}.sub{color:var(--muted);font-size:.9rem;margin-top:2px}
+    .legend{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:12px;font-size:.82rem;color:var(--muted)}.legend span{display:flex;align-items:center;gap:6px}.dot{width:12px;height:12px;border-radius:4px}.dw{background:var(--work)}.df{background:var(--weekend)}.dh{background:var(--holiday)}.dv{background:var(--vacation)}
+    .calendar-wrap{overflow-x:auto}.calendar{display:grid;grid-template-columns:repeat(7,minmax(72px,1fr));gap:6px;min-width:560px}.weekday{text-align:center;font-weight:850;color:var(--navy);padding:8px 4px}
+    .day{min-height:88px;border:1px solid var(--line);border-radius:14px;background:white;padding:7px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;text-align:left}
+    .day.outside{opacity:.42;background:#F4F6F8}.day.today{outline:3px solid var(--gold);outline-offset:-2px}.day.work{background:var(--work)}.day.weekend{background:var(--weekend)}.day.holiday{background:var(--holiday)}.day.vacation{background:var(--vacation)}
+    .daynum{font-weight:850}.mark{font-weight:900;color:var(--navy)}.daymeta{font-size:.71rem;color:var(--muted);line-height:1.25;min-height:18px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+    .summary,.annual{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .stat{position:relative;border:1px solid var(--line);border-radius:14px;padding:12px 12px 12px 48px;min-height:88px;overflow:hidden}
+    .stat::before{content:attr(data-icon);position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.65rem;line-height:1}
+    .stat small{color:var(--muted);display:block;font-weight:750}
+    .stat strong{font-size:1.4rem;color:var(--navy);display:block;margin-top:3px}
+    .stat.workcard{background:#F0FBF3;border-color:#CFEBD7}
+    .stat.weekendcard{background:#FFF8ED;border-color:#F2DFC2}
+    .stat.holidaycard{background:#F1F6FF;border-color:#D5E3FA}
+    .stat.vacationcard{background:#F8F1FF;border-color:#E5D3F5}
+    .stat.dietcard{background:#F9F1FF;border-color:#E8D4F5}
+    .stat.pluscard{background:#FFF8EE;border-color:#F1DFC8}
+    .stat.dayscard{background:#EEF8FF;border-color:#D2E6F4}
+    .stat.total{background:#EEF5FF;border-color:#C8DDF7}
+    .stat.total small,.stat.total strong{color:var(--navy)}
+    .dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.monthcard{border:1px solid var(--line);border-radius:16px;padding:13px;background:white;cursor:pointer}.monthcard h3{margin:0 0 8px;color:var(--navy);font-size:1rem}.minirow{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.8rem;margin-top:4px}.amount{color:var(--gold);font-size:1.45rem;font-weight:900;margin-top:8px}
+    .modal{position:fixed;inset:0;background:rgba(5,18,35,.62);display:none;align-items:flex-end;justify-content:center;z-index:60;padding:12px}.modal.open{display:flex}.modalbox{width:min(540px,100%);background:white;border-radius:22px 22px 16px 16px;padding:16px;max-height:93vh;overflow:auto;box-shadow:0 -10px 45px rgba(0,0,0,.28)}
+    .modalbox h2{margin:0 0 4px;color:var(--navy)}.form{margin:12px 0}.form label{display:block;font-size:.84rem;font-weight:800;margin-bottom:6px;color:var(--navy)}.input{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;background:white}.form textarea{min-height:82px;resize:vertical}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actionbtn{min-height:54px;border:1px solid var(--line);border-radius:14px;background:#F8FAFC;font-weight:800}
+    .loginwrap{position:fixed;inset:0;background:linear-gradient(145deg,var(--navy),#07182D);display:flex;align-items:center;justify-content:center;z-index:100;padding:18px}.loginbox{width:min(440px,100%);background:white;border-radius:22px;padding:22px;box-shadow:0 20px 70px rgba(0,0,0,.35)}.loginlogo{display:block;max-width:210px;max-height:80px;margin:0 auto 16px}.error{background:#FFE1E1;color:#8E1D1D;border-radius:10px;padding:9px;margin:10px 0;font-size:.86rem}.info{background:#EAF2FF;color:#173F70;border-radius:10px;padding:9px;margin:10px 0;font-size:.86rem}
+
+    @media(min-width:761px){
+      .actions .btn{
+        min-height:46px;
+        padding:9px 15px;
+        font-size:.9rem;
+        border-radius:14px
+      }
+    }
+
+    @media(max-width:760px){
+      .topbar{padding:8px 9px 9px;min-height:auto}
+      .topline{min-height:58px;align-items:center}
+      .brand{height:58px}
+      .brand img{height:56px;max-width:130px}
+      .actions{margin-top:0;gap:5px}
+      .actions .btn{min-height:38px;padding:7px 9px;font-size:.76rem}
+      .syncbar{margin-left:auto;margin-top:5px}
+      .navrow{
+        width:100%;
+        margin-top:6px;
+        grid-template-columns:1fr;
+        gap:6px
+      }
+      .summary,.annual{grid-template-columns:repeat(2,1fr)}
+      .dashboard{grid-template-columns:1fr}
+    }
+    @media(max-width:430px){
+      main{padding:7px}.card{padding:9px}.actions .btn{font-size:.73rem;padding:7px 8px;min-height:36px}
+      .calendar-wrap{overflow-x:hidden}
+      .calendar{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+      .weekday{padding:5px 1px;font-size:.72rem}
+      .day{min-height:58px;border-radius:9px;padding:4px;overflow:hidden}
+      .daynum{font-size:.82rem}.mark{font-size:.78rem}
+      .daymeta{font-size:.56rem;min-height:12px;-webkit-line-clamp:1}
+      .grid2{grid-template-columns:1fr}
+    }
+    @media print{@page{size:A4 portrait;margin:10mm}body{background:white}.topbar,.noprint,.loginwrap{display:none!important}.app{width:100%}main{padding:0}.card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}#calendarView{display:none!important}#dashboardView{display:block!important}.dashboard{grid-template-columns:repeat(3,1fr);gap:7px}.monthcard{padding:8px}.amount{font-size:1.05rem}.annual{grid-template-columns:repeat(4,1fr)}}
+  </style>
+</head>
+<body>
+
+<div id="loginScreen" class="loginwrap">
+  <div class="loginbox">
+    <img class="loginlogo" src="logo.png" alt="Cotacero Galicia" onerror="this.style.display='none'">
+    <h2 style="color:var(--navy);margin:0">Dietas V8.1</h2>
+    <p class="sub">Acceso y sincronización mediante Firebase</p>
+    <div id="loginError" class="info">Introduce el usuario creado en Firebase Authentication.</div>
+    <div class="form"><label for="loginEmail">Correo electrónico</label><input id="loginEmail" class="input" type="email" autocomplete="username"></div>
+    <div class="form"><label for="loginPassword">Contraseña</label><input id="loginPassword" class="input" type="password" autocomplete="current-password"></div>
+    <button id="loginBtn" class="btn primary block">Iniciar sesión</button>
+  </div>
+</div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="topline">
+      <div class="brand"><img src="logo.png" alt="Logo" onerror="this.style.display='none'"></div>
+      <div class="actions"><button id="btnConfig" class="btn outline">⚙️ Config.</button><button id="btnDashboard" class="btn primary">📊 Dashboard</button></div>
+    </div>
+    <div class="navrow noprint">
+      <div class="navbox"><button id="prevYear">◀</button><div id="yearLabel" class="navlabel"></div><button id="nextYear">▶</button></div>
+      <div class="navbox"><button id="prevMonth">◀</button><div id="monthLabel" class="navlabel"></div><button id="nextMonth">▶</button></div>
+    </div>
+    <div class="syncbar"><i id="syncDot" class="syncdot"></i><span id="syncText">Esperando inicio de sesión…</span></div>
+  </header>
+
+  <main>
+    <section id="calendarView">
+      <div class="card">
+        <div class="periodbar"><div><div id="periodTitle" class="periodtitle"></div><div id="periodRange" class="sub"></div></div><button id="btnToday" class="btn light noprint">Hoy</button></div>
+        <div class="legend"><span><i class="dot dw"></i>Trabajo</span><span><i class="dot df"></i>Fin de semana</span><span><i class="dot dh"></i>Festivo</span><span><i class="dot dv"></i>Vacaciones</span></div>
+      </div>
+      <div class="card calendar-wrap"><div id="calendar" class="calendar"></div></div>
+      <div class="card"><h2 style="color:var(--navy);margin-top:0">Resumen del período</h2><div id="periodSummary" class="summary"></div></div>
+    </section>
+
+    <section id="dashboardView" class="hidden">
+      <div class="card noprint">
+        <div class="periodbar"><div><h2 style="color:var(--navy);margin:0">Dashboard anual</h2><div id="dashboardYearText" class="sub"></div></div><div style="display:flex;gap:8px"><button id="btnBack" class="btn light">← Volver</button><button id="btnPrint" class="btn primary">📄 PDF</button></div></div>
+      </div>
+      <div class="card"><div id="dashboardGrid" class="dashboard"></div></div>
+      <div class="card"><h2 style="color:var(--navy);margin-top:0">Resumen anual</h2><div id="annualSummary" class="annual"></div></div>
+    </section>
+  </main>
+</div>
+
+<div id="dayModal" class="modal"><div class="modalbox">
+  <h2 id="modalDateTitle"></h2><div id="modalDateSub" class="sub"></div>
+  <div id="automaticHolidayInfo" class="info hidden"></div>
+  <div class="grid2" style="margin-top:12px">
+    <button class="actionbtn" data-day-action="work">✅ Trabajo</button>
+    <button class="actionbtn" data-day-action="holiday">🟦 Festivo trabajado</button>
+    <button class="actionbtn" data-day-action="vacation">🏖 Vacaciones</button>
+    <button class="actionbtn" data-day-action="clear">❌ Borrar estado</button>
+  </div>
+  <button id="toggleNote" class="btn light block" style="margin-top:10px">📝 Añadir observación (opcional)</button>
+  <div id="noteArea" class="hidden">
+    <div class="form"><label for="dayNote">Observaciones</label><textarea id="dayNote" class="input" placeholder="Escribe aquí la anotación"></textarea></div>
+    <div class="grid2"><button id="closeDayModal" class="btn light">Cancelar</button><button id="saveDayModal" class="btn primary">Guardar</button></div>
+  </div>
+  <button id="closeDayModalSimple" class="btn light block" style="margin-top:10px">Cancelar</button>
+</div></div>
+
+<div id="configModal" class="modal"><div class="modalbox">
+  <h2>Configuración</h2>
+  <div class="grid2">
+    <div class="form"><label for="dailyAllowance">Dieta diaria (€)</label><input id="dailyAllowance" class="input" type="number" min="0" step=".01"></div>
+    <div class="form"><label for="weekendBonus">Plus FDS/festivo (€)</label><input id="weekendBonus" class="input" type="number" min="0" step=".01"></div>
+  </div>
+  <div class="form"><label for="employeeName">Nombre</label><input id="employeeName" class="input"></div>
+  <div class="grid2"><button id="closeConfigModal" class="btn light">Cancelar</button><button id="saveConfig" class="btn primary">Guardar</button></div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+  <div class="grid2"><button id="exportData" class="btn light">Exportar copia</button><label class="btn light" style="text-align:center;cursor:pointer">Importar copia<input id="importData" type="file" accept="application/json" hidden></label></div>
+  <button id="logoutBtn" class="btn danger block" style="margin-top:10px">Cerrar sesión</button>
+</div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBraIIHTO-zkzBzvO02Z8XuzjTbon12rqg",
+  authDomain: "cotacero-dietas.firebaseapp.com",
+  databaseURL: "https://cotacero-dietas-default-rtdb.europe-west1.firebasedatabase.app/",
+  projectId: "cotacero-dietas",
+  storageBucket: "cotacero-dietas.firebasestorage.app",
+  messagingSenderId: "655101775169",
+  appId: "1:655101775169:web:4c6e9b220a17b265d365c0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
+
+const CACHE_KEY = "cotacero_dietas_v8_cache";
+const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const WEEKDAYS = ["L","M","X","J","V","S","D"];
+const defaultState = {
+  version:8,
+  viewYear:new Date().getFullYear(),
+  viewMonth:new Date().getMonth(),
+  settings:{dailyAllowance:35,weekendBonus:100,employeeName:""},
+  days:{}
+};
+
+let state = loadCache();
+let currentUser = null;
+let unsubscribeDatabase = null;
+let selectedDateKey = null;
+let selectedDayType = null;
+const el = id => document.getElementById(id);
+
+function clone(v){return JSON.parse(JSON.stringify(v))}
+function normalizeState(v){
+  return {...clone(defaultState),...(v||{}),settings:{...defaultState.settings,...((v&&v.settings)||{})},days:(v&&v.days)||{}};
+}
+function loadCache(){
+  try{return normalizeState(JSON.parse(localStorage.getItem(CACHE_KEY)||"null"))}
+  catch{return clone(defaultState)}
+}
+function saveCache(){localStorage.setItem(CACHE_KEY,JSON.stringify(state))}
+function setSync(mode,text){el("syncDot").className="syncdot"+(mode?" "+mode:"");el("syncText").textContent=text}
+
+async function saveState(){
+  saveCache();
+  if(!currentUser)return;
+  try{
+    setSync("","Guardando…");
+    await set(ref(database,`users/${currentUser.uid}/appState`),state);
+    setSync("ok","Sincronizado");
+  }catch(e){
+    console.error(e);
+    setSync("bad","Error de sincronización; copia local conservada");
+  }
+}
+
+function connectRealtime(user){
+  if(unsubscribeDatabase)unsubscribeDatabase();
+  const userRef=ref(database,`users/${user.uid}/appState`);
+  unsubscribeDatabase=onValue(userRef,snap=>{
+    const remote=snap.val();
+    if(remote){
+      state=normalizeState(remote);
+      saveCache();
+      render();
+      if(!el("dashboardView").classList.contains("hidden"))renderDashboard();
+      setSync("ok","Sincronizado");
+    }else{
+      saveState();
+    }
+  },err=>{
+    console.error(err);
+    setSync("bad","Sin acceso a Firebase; usando copia local");
+  });
+}
+
+onAuthStateChanged(auth,user=>{
+  currentUser=user||null;
+  if(user){
+    el("loginScreen").classList.add("hidden");
+    setSync("","Conectando…");
+    connectRealtime(user);
+    render();
+  }else{
+    if(unsubscribeDatabase){unsubscribeDatabase();unsubscribeDatabase=null}
+    el("loginScreen").classList.remove("hidden");
+    setSync("bad","Sesión cerrada");
+  }
+});
+
+el("loginBtn").addEventListener("click",async()=>{
+  const email=el("loginEmail").value.trim();
+  const password=el("loginPassword").value;
+  const msg=el("loginError");
+  if(!email||!password){msg.className="error";msg.textContent="Introduce el correo y la contraseña.";return}
+  try{
+    el("loginBtn").disabled=true;
+    msg.className="info";msg.textContent="Iniciando sesión…";
+    await signInWithEmailAndPassword(auth,email,password);
+    el("loginPassword").value="";
+  }catch(e){
+    console.error(e);
+    msg.className="error";
+    msg.textContent="No se pudo iniciar sesión. Comprueba correo, contraseña y que Email/Password esté activado.";
+  }finally{
+    el("loginBtn").disabled=false;
+  }
+});
+
+el("logoutBtn").addEventListener("click",async()=>{closeModal("configModal");await signOut(auth)});
+
+function pad(n){return String(n).padStart(2,"0")}
+function toKey(d){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function fromKey(k){const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d)}
+function euro(v){return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(v||0)}
+function formatDateLong(d){return new Intl.DateTimeFormat("es-ES",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d)}
+function getPeriodForMonth(y,m){return{start:new Date(y,m-1,26),end:new Date(y,m,25)}}
+function eachDate(start,end,cb){const d=new Date(start);while(d<=end){cb(new Date(d));d.setDate(d.getDate()+1)}}
+function isWeekend(d){return d.getDay()===0||d.getDay()===6}
+
+function easterSunday(year){
+  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4;
+  const f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4;
+  const l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31);
+  const day=((h+l-7*m+114)%31)+1;
+  return new Date(year,month-1,day);
+}
+
+function nationalHoliday(date){
+  const y=date.getFullYear(),m=date.getMonth()+1,d=date.getDate();
+  const fixed={
+    "1-1":"Año Nuevo",
+    "1-6":"Epifanía del Señor",
+    "5-1":"Fiesta del Trabajo",
+    "8-15":"Asunción de la Virgen",
+    "10-12":"Fiesta Nacional de España",
+    "11-1":"Todos los Santos",
+    "12-6":"Día de la Constitución",
+    "12-8":"Inmaculada Concepción",
+    "12-25":"Navidad"
+  };
+  const fixedName=fixed[`${m}-${d}`];
+  if(fixedName)return fixedName;
+
+  const easter=easterSunday(y);
+  const goodFriday=new Date(easter);
+  goodFriday.setDate(easter.getDate()-2);
+  if(toKey(date)===toKey(goodFriday))return "Viernes Santo";
+  return "";
+}
+
+function getDayEntry(k){return state.days[k]||null}
+
+function calculatePeriod(y,m){
+  const {start,end}=getPeriodForMonth(y,m);
+  const r={laborables:0,finesSemana:0,festivos:0,vacaciones:0,diasDieta:0,dietas:0,plus:0,total:0};
+  eachDate(start,end,d=>{
+    const e=getDayEntry(toKey(d)); if(!e)return;
+    if(e.type==="vacation"){r.vacaciones++;return}
+    if(e.type==="holiday"){r.festivos++;r.diasDieta++;r.dietas+=Number(state.settings.dailyAllowance)||0;r.plus+=Number(state.settings.weekendBonus)||0;return}
+    if(e.type==="work"){
+      r.diasDieta++;r.dietas+=Number(state.settings.dailyAllowance)||0;
+      if(nationalHoliday(d)){
+        r.festivos++;
+        r.plus+=Number(state.settings.weekendBonus)||0;
+      }else if(isWeekend(d)){
+        r.finesSemana++;
+        r.plus+=Number(state.settings.weekendBonus)||0;
+      }else{
+        r.laborables++;
+      }
+    }
+  });
+  r.total=r.dietas+r.plus;return r;
+}
+
+function statCard(l,v,kind=""){
+  const icons={workcard:"✅",weekendcard:"✓✓",holidaycard:"🇪🇸",vacationcard:"🏖",dietcard:"📅",pluscard:"🪙",dayscard:"📋",total:"👛"};
+  return `<div class="stat ${kind}" data-icon="${icons[kind]||"•"}"><small>${l}</small><strong>${v}</strong></div>`;
+}
+
+function render(){
+  el("yearLabel").textContent=state.viewYear;
+  el("monthLabel").textContent=MONTHS[state.viewMonth].toUpperCase();
+  const {start,end}=getPeriodForMonth(state.viewYear,state.viewMonth);
+  el("periodTitle").textContent=`Período ${MONTHS[state.viewMonth]} ${state.viewYear}`;
+  el("periodRange").textContent=`${start.getDate()} ${MONTHS[start.getMonth()]} ${start.getFullYear()} → ${end.getDate()} ${MONTHS[end.getMonth()]} ${end.getFullYear()}`;
+  renderCalendar();renderPeriodSummary();
+}
+
+function renderCalendar(){
+  const c=el("calendar");c.innerHTML="";
+  WEEKDAYS.forEach(d=>c.insertAdjacentHTML("beforeend",`<div class="weekday">${d}</div>`));
+  const first=new Date(state.viewYear,state.viewMonth,1),off=(first.getDay()+6)%7,gridStart=new Date(state.viewYear,state.viewMonth,1-off),today=toKey(new Date());
+  for(let i=0;i<42;i++){
+    const d=new Date(gridStart);d.setDate(gridStart.getDate()+i);
+    const k=toKey(d),e=getDayEntry(k),autoHoliday=nationalHoliday(d);let cls="day",mark="",status="";
+    if(d.getMonth()!==state.viewMonth)cls+=" outside";if(k===today)cls+=" today";
+    if(e){
+      if(e.type==="work"){
+        if(autoHoliday){cls+=" holiday";mark="✓✓";status="Trabajo festivo"}
+        else if(isWeekend(d)){cls+=" weekend";mark="✓✓";status="Trabajo FDS"}
+        else{cls+=" work";mark="✓";status="Trabajo"}
+      }
+      else if(e.type==="holiday"){cls+=" holiday";mark="✓✓";status="Festivo trabajado"}
+      else if(e.type==="vacation"){cls+=" vacation";mark="🏖";status="Vacaciones"}
+    }else if(autoHoliday){
+      cls+=" holiday";mark="🇪🇸";status=autoHoliday;
+    }
+    c.insertAdjacentHTML("beforeend",`<button class="${cls}" type="button" data-date="${k}"><div style="display:flex;justify-content:space-between"><span class="daynum">${d.getDate()}</span><span class="mark">${mark}</span></div><div class="daymeta">${escapeHtml(e?.note||status||"")}</div></button>`);
+  }
+}
+
+function renderPeriodSummary(){
+  const r=calculatePeriod(state.viewYear,state.viewMonth);
+  el("periodSummary").innerHTML=[
+    statCard("Laborables",r.laborables,"workcard"),
+    statCard("Fin de semana",r.finesSemana,"weekendcard"),
+    statCard("Festivos trabajados",r.festivos,"holidaycard"),
+    statCard("Vacaciones",r.vacaciones,"vacationcard"),
+    statCard(`Dietas (${euro(state.settings.dailyAllowance)})`,euro(r.dietas),"dietcard"),
+    statCard(`Plus FDS/festivo (${euro(state.settings.weekendBonus)})`,euro(r.plus),"pluscard"),
+    statCard("Días con dieta",r.diasDieta,"dayscard"),
+    statCard("Total período",euro(r.total),"total")
+  ].join("");
+}
+
+function renderDashboard(){
+  el("dashboardYearText").textContent=`${state.settings.employeeName?state.settings.employeeName+" · ":""}${state.viewYear}`;
+  let annual={laborables:0,finesSemana:0,festivos:0,vacaciones:0,diasDieta:0,dietas:0,plus:0,total:0},out="";
+  for(let m=0;m<12;m++){
+    const r=calculatePeriod(state.viewYear,m);Object.keys(annual).forEach(k=>annual[k]+=r[k]);
+    out+=`<article class="monthcard" data-month="${m}"><h3>${MONTHS[m].toUpperCase()}</h3><div class="minirow"><span>Laborables</span><strong>${r.laborables}</strong></div><div class="minirow"><span>FDS</span><strong>${r.finesSemana}</strong></div><div class="minirow"><span>Festivos</span><strong>${r.festivos}</strong></div><div class="minirow"><span>Vacaciones</span><strong>${r.vacaciones}</strong></div><div class="minirow"><span>Dietas</span><strong>${euro(r.dietas)}</strong></div><div class="minirow"><span>Plus</span><strong>${euro(r.plus)}</strong></div><div class="amount">${euro(r.total)}</div></article>`;
+  }
+  el("dashboardGrid").innerHTML=out;
+  el("annualSummary").innerHTML=[
+    statCard("Laborables",annual.laborables,"workcard"),
+    statCard("Fin de semana",annual.finesSemana,"weekendcard"),
+    statCard("Festivos trabajados",annual.festivos,"holidaycard"),
+    statCard("Vacaciones",annual.vacaciones,"vacationcard"),
+    statCard("Dietas",euro(annual.dietas),"dietcard"),
+    statCard("Plus",euro(annual.plus),"pluscard"),
+    statCard("Días con dieta",annual.diasDieta,"dayscard"),
+    statCard("Total anual",euro(annual.total),"total")
+  ].join("");
+}
+
+function showDashboard(){el("calendarView").classList.add("hidden");el("dashboardView").classList.remove("hidden");renderDashboard();window.scrollTo({top:0,behavior:"smooth"})}
+function showCalendar(){el("dashboardView").classList.add("hidden");el("calendarView").classList.remove("hidden");render();window.scrollTo({top:0,behavior:"smooth"})}
+function openModal(id){el(id).classList.add("open")}
+function closeModal(id){el(id).classList.remove("open")}
+
+function openDayModal(k){
+  selectedDateKey=k;
+  const d=fromKey(k),e=getDayEntry(k),holiday=nationalHoliday(d);
+  selectedDayType=e?.type||null;
+  el("modalDateTitle").textContent=`${d.getDate()} de ${MONTHS[d.getMonth()]}`;
+  el("modalDateSub").textContent=formatDateLong(d);
+  el("dayNote").value=e?.note||"";
+  el("noteArea").classList.add("hidden");
+  el("toggleNote").classList.remove("hidden");
+  el("closeDayModalSimple").classList.remove("hidden");
+  if(e?.note){
+    el("noteArea").classList.remove("hidden");
+    el("toggleNote").classList.add("hidden");
+    el("closeDayModalSimple").classList.add("hidden");
+  }
+  if(holiday){
+    el("automaticHolidayInfo").textContent=`🇪🇸 Festivo nacional: ${holiday}`;
+    el("automaticHolidayInfo").classList.remove("hidden");
+  }else{
+    el("automaticHolidayInfo").classList.add("hidden");
+  }
+  updateActions();
+  openModal("dayModal");
+}
+function updateActions(){
+  document.querySelectorAll("[data-day-action]").forEach(b=>{
+    b.style.outline=b.dataset.dayAction===selectedDayType?"3px solid var(--gold)":"none";
+  });
+}
+async function saveSelectedDay(){
+  const note=el("dayNote").value.trim();
+  if(!selectedDayType&&!note)delete state.days[selectedDateKey];
+  else state.days[selectedDateKey]={type:selectedDayType,note};
+  closeModal("dayModal");render();await saveState();
+}
+async function selectAndAutoSave(action){
+  if(action==="clear"){
+    delete state.days[selectedDateKey];
+  }else{
+    selectedDayType=action;
+    state.days[selectedDateKey]={type:action,note:""};
+  }
+  closeModal("dayModal");
+  render();
+  await saveState();
+}
+function openConfig(){el("dailyAllowance").value=state.settings.dailyAllowance;el("weekendBonus").value=state.settings.weekendBonus;el("employeeName").value=state.settings.employeeName||"";openModal("configModal")}
+async function saveConfig(){state.settings.dailyAllowance=Math.max(0,Number(el("dailyAllowance").value)||0);state.settings.weekendBonus=Math.max(0,Number(el("weekendBonus").value)||0);state.settings.employeeName=el("employeeName").value.trim();closeModal("configModal");render();await saveState()}
+function exportBackup(){const b=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=`dietas_v8_${state.viewYear}.json`;a.click();URL.revokeObjectURL(u)}
+function importBackup(file){if(!file)return;const r=new FileReader();r.onload=async()=>{try{const x=JSON.parse(r.result);if(!x.days)throw 0;state=normalizeState(x);closeModal("configModal");render();await saveState();alert("Copia importada y sincronizada.")}catch{alert("Archivo no válido.")}};r.readAsText(file)}
+function escapeHtml(t){return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+
+el("prevYear").onclick=async()=>{state.viewYear--;render();await saveState()};el("nextYear").onclick=async()=>{state.viewYear++;render();await saveState()};
+el("prevMonth").onclick=async()=>{state.viewMonth--;if(state.viewMonth<0){state.viewMonth=11;state.viewYear--}render();await saveState()};
+el("nextMonth").onclick=async()=>{state.viewMonth++;if(state.viewMonth>11){state.viewMonth=0;state.viewYear++}render();await saveState()};
+el("btnToday").onclick=async()=>{const n=new Date();state.viewYear=n.getFullYear();state.viewMonth=n.getMonth();render();await saveState()};
+el("calendar").onclick=e=>{const b=e.target.closest("[data-date]");if(b)openDayModal(b.dataset.date)};
+document.querySelectorAll("[data-day-action]").forEach(b=>b.onclick=async()=>{
+  const action=b.dataset.dayAction;
+  if(!el("noteArea").classList.contains("hidden")){
+    if(action==="clear"){selectedDayType=null;el("dayNote").value=""}
+    else selectedDayType=action;
+    updateActions();
+    return;
+  }
+  await selectAndAutoSave(action);
+});
+el("toggleNote").onclick=()=>{
+  el("noteArea").classList.remove("hidden");
+  el("toggleNote").classList.add("hidden");
+  el("closeDayModalSimple").classList.add("hidden");
+  updateActions();
+  setTimeout(()=>el("dayNote").focus(),50);
+};
+el("saveDayModal").onclick=saveSelectedDay;
+el("closeDayModal").onclick=()=>closeModal("dayModal");
+el("closeDayModalSimple").onclick=()=>closeModal("dayModal");
+el("btnConfig").onclick=openConfig;el("saveConfig").onclick=saveConfig;el("closeConfigModal").onclick=()=>closeModal("configModal");
+el("btnDashboard").onclick=showDashboard;el("btnBack").onclick=showCalendar;el("btnPrint").onclick=()=>window.print();
+el("dashboardGrid").onclick=async e=>{const c=e.target.closest("[data-month]");if(c){state.viewMonth=Number(c.dataset.month);await saveState();showCalendar()}};
+el("exportData").onclick=exportBackup;el("importData").onchange=e=>{importBackup(e.target.files?.[0]);e.target.value=""};
+document.querySelectorAll(".modal").forEach(m=>m.onclick=e=>{if(e.target===m)closeModal(m.id)});
+render();
+</script>
+</body>
+</html>
