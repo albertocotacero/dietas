@@ -50,6 +50,15 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
 .badge{display:inline-block;background:#ecfeff;color:#155e75;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}
 #pointList{margin-top:8px}
 .pointsummary{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;line-height:1.45}
+.pointlist{margin-top:8px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.pointlisthead,.pointlistrow{display:grid;grid-template-columns:42px 1fr 1fr 1fr;gap:6px;align-items:center;padding:8px 9px}
+.pointlisthead{background:#eef2f7;color:var(--muted);font-size:11px;font-weight:800}
+.pointlistrow{font-size:13px;border-top:1px solid var(--border);background:#fff;cursor:pointer}
+.pointlistrow:first-of-type{border-top:0}
+.pointlistrow:hover{background:#f8fafc}
+.pointlistrow b{color:var(--accent2)}
+.pointactions{display:flex;gap:7px;margin-top:8px}
+.pointactions button{flex:1}
 .modal{position:fixed;inset:0;background:rgba(3,20,19,.62);display:none;align-items:center;justify-content:center;z-index:80;padding:18px}
 .modal.open{display:flex}
 .modalbox{width:min(430px,100%);background:white;border-radius:20px;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.35)}
@@ -95,7 +104,7 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
 
 <header>
   <div class="headrow">
-    <div><h1>Autonivelante Pro</h1><div class="sub">PWA v1.2 · planos, cotas láser y cálculo de material</div></div>
+    <div><h1>Autonivelante Pro</h1><div class="sub">PWA v1.3 · planos, cotas láser y cálculo de material</div></div>
     <div class="actions">
       <div class="sync"><i id="syncDot" class="syncdot"></i><span id="syncText">Sin conectar</span></div>
       <button id="logoutBtn">Salir</button>
@@ -155,7 +164,10 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
     <div class="section">
       <span class="badge">3 · Cotas</span>
       <div id="pointList"></div>
-      <p class="help">Pulsa “Añadir cota” y toca el plano. Para editar una cota existente, tócala directamente sobre el plano.</p>
+      <div class="pointactions">
+        <button id="clearAllPointsBtn" class="danger">Borrar todas las cotas</button>
+      </div>
+      <p class="help">Pulsa “Añadir cota” y toca el plano. Para editar una cota existente, toca su círculo o una fila del listado.</p>
     </div>
 
     <div class="section">
@@ -450,17 +462,58 @@ $('pointModal').onclick=e=>{if(e.target===$('pointModal'))closePointModal()};
 
 function renderPointList(){
  const box=$('pointList');
- if(!points.length){box.innerHTML='<div class="pointsummary">Todavía no hay cotas.</div>';return}
+ if(!points.length){
+   box.innerHTML='<div class="pointsummary">Todavía no hay cotas.</div>';
+   return;
+ }
  const readings=points.map(p=>Number(p.reading)).filter(Number.isFinite);
  const target=targetLaserReading();
+ const ref=+$('referenceReading').value||0;
+
+ let rows='';
+ points.forEach((p,i)=>{
+   const diff=(+p.reading)-ref;
+   const diffText=Math.abs(diff)<0.05
+     ? '0,0 mm'
+     : `${diff>0?'+':''}${fmt(diff,1)} mm`;
+   rows+=`<div class="pointlistrow" data-point-index="${i}">
+     <b>${i+1}</b>
+     <span>${fmt(p.reading,1)} mm</span>
+     <span>${diffText}</span>
+     <span>${fmt(pointThickness(p.reading),1)} mm</span>
+   </div>`;
+ });
+
  box.innerHTML=`<div class="pointsummary">
    <b>${points.length} cotas registradas</b><br>
    Punto más alto: ${fmt(Math.min(...readings),1)} mm<br>
    Punto más bajo: ${fmt(Math.max(...readings),1)} mm<br>
    Desnivel total: ${fmt(Math.max(...readings)-Math.min(...readings),1)} mm
    ${target!==null?`<br>Plano de acabado: ${fmt(target,1)} mm`:''}
+ </div>
+ <div class="pointlist">
+   <div class="pointlisthead">
+     <span>N.º</span><span>Lectura</span><span>Δ referencia</span><span>Espesor</span>
+   </div>
+   ${rows}
  </div>`;
+
+ box.querySelectorAll('[data-point-index]').forEach(row=>{
+   row.onclick=()=>openPointModal(Number(row.dataset.pointIndex),null);
+ });
 }
+$('clearAllPointsBtn').onclick=()=>{
+ if(!points.length)return toast('No hay cotas para borrar');
+ if(confirm(`¿Borrar las ${points.length} cotas del proyecto?`)){
+   points=[];
+   heatSamples=[];
+   lastAction=null;
+   renderPointList();
+   draw();
+   scheduleSave();
+   toast('Todas las cotas han sido borradas');
+ }
+};
 $('undoBtn').onclick=()=>{if(lastAction==='point'&&points.length)points.pop();else if(lastAction==='boundary'&&boundary.length)boundary.pop();else if(lastAction==='cal'&&calibration.length)calibration.pop();updateScale();renderPointList();draw();scheduleSave()};
 inputIds.forEach(id=>$(id).addEventListener(id==='projectName'?'input':'change',()=>{if(id==='calDistance'||id==='calUnit')updateScale();renderPointList();scheduleSave()}));
 $('saveBtn').onclick=()=>{saveRemote();toast('Proyecto guardado')};$('printBtn').onclick=()=>window.print();
