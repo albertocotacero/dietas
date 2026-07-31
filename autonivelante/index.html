@@ -90,7 +90,7 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
 
 <header>
   <div class="headrow">
-    <div><h1>Autonivelante Pro</h1><div class="sub">PWA · planos, cotas láser y cálculo de material</div></div>
+    <div><h1>Autonivelante Pro</h1><div class="sub">PWA v1.1 · planos, cotas láser y cálculo de material</div></div>
     <div class="actions">
       <div class="sync"><i id="syncDot" class="syncdot"></i><span id="syncText">Sin conectar</span></div>
       <button id="logoutBtn">Salir</button>
@@ -188,7 +188,7 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
 
 const firebaseConfig={
- apiKey:"AIzaSyBraIIHTO-zkzBzBvO02Z8XuzjTbon12rqg",
+ apiKey:"AIzaSyBraIIHTO-zkzBzvO02Z8XuzjTbon12rqg",
  authDomain:"cotacero-dietas.firebaseapp.com",
  databaseURL:"https://cotacero-dietas-default-rtdb.europe-west1.firebasedatabase.app/",
  projectId:"cotacero-dietas",
@@ -247,7 +247,21 @@ $('loginBtn').onclick=async()=>{
  const email=$('loginEmail').value.trim(),password=$('loginPassword').value,msg=$('loginMsg');
  if(!email||!password){msg.className='error';msg.textContent='Introduce correo y contraseña.';return}
  try{$('loginBtn').disabled=true;await signInWithEmailAndPassword(auth,email,password)}
- catch(e){console.error(e);msg.className='error';msg.textContent='No se pudo iniciar sesión.'}
+ catch(e){
+   console.error(e);
+   msg.className='error';
+   const code=e?.code||'error-desconocido';
+   const messages={
+     'auth/invalid-credential':'Correo o contraseña incorrectos.',
+     'auth/user-not-found':'El usuario no existe en Firebase Authentication.',
+     'auth/wrong-password':'Contraseña incorrecta.',
+     'auth/invalid-email':'El correo electrónico no es válido.',
+     'auth/network-request-failed':'No hay conexión con Firebase.',
+     'auth/unauthorized-domain':'Este dominio de GitHub Pages no está autorizado en Firebase.',
+     'auth/operation-not-allowed':'El acceso mediante correo y contraseña no está habilitado.'
+   };
+   msg.textContent=messages[code]||('No se pudo iniciar sesión: '+code);
+ }
  finally{$('loginBtn').disabled=false}
 };
 $('logoutBtn').onclick=()=>signOut(auth);
