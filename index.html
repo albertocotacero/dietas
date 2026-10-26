@@ -461,11 +461,19 @@ function render(){
 function renderCalendar(){
   const c=el("calendar");c.innerHTML="";
   WEEKDAYS.forEach(d=>c.insertAdjacentHTML("beforeend",`<div class="weekday">${d}</div>`));
-  const first=new Date(state.viewYear,state.viewMonth,1),off=(first.getDay()+6)%7,gridStart=new Date(state.viewYear,state.viewMonth,1-off),today=toKey(new Date());
-  for(let i=0;i<42;i++){
-    const d=new Date(gridStart);d.setDate(gridStart.getDate()+i);
+  // La vista ampliada es independiente del período de cobro (26 a 25).
+  const first=new Date(state.viewYear,state.viewMonth-1,25);
+  const last=new Date(state.viewYear,state.viewMonth+1,0);
+  const off=(first.getDay()+6)%7,gridStart=new Date(first),gridEnd=new Date(last),today=toKey(new Date());
+  gridStart.setDate(first.getDate()-off);
+  gridEnd.setDate(last.getDate()+6-(last.getDay()+6)%7);
+  eachDate(gridStart,gridEnd,d=>{
+    if(d<first||d>last){
+      c.insertAdjacentHTML("beforeend",'<div class="day outside" style="visibility:hidden" aria-hidden="true"></div>');
+      return;
+    }
     const k=toKey(d),e=getDayEntry(k),autoHoliday=nationalHoliday(d);let cls="day",mark="",status="";
-    if(d.getMonth()!==state.viewMonth)cls+=" outside";if(k===today)cls+=" today";
+    if(k===today)cls+=" today";
     if(e){
       if(e.type==="work"){
         if(autoHoliday){cls+=" holiday";mark="✓✓";status="Trabajo festivo"}
@@ -477,8 +485,8 @@ function renderCalendar(){
     }else if(autoHoliday){
       cls+=" holiday";mark="🇪🇸";status=autoHoliday;
     }
-    c.insertAdjacentHTML("beforeend",`<button class="${cls}" type="button" data-date="${k}"><div style="display:flex;justify-content:space-between"><span class="daynum">${d.getDate()}</span><span class="mark">${mark}</span></div><div class="daymeta">${escapeHtml(e?.note||status||"")}</div></button>`);
-  }
+    c.insertAdjacentHTML("beforeend",`<button class="${cls}" type="button" data-date="${k}" aria-label="${escapeHtml(formatDateLong(d))}"><div style="display:flex;justify-content:space-between"><span class="daynum">${d.getDate()}</span><span class="mark">${mark}</span></div><div class="daymeta">${escapeHtml(e?.note||status||"")}</div></button>`);
+  });
 }
 
 function renderPeriodSummary(){
